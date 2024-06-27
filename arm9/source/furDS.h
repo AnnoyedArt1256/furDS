@@ -25,13 +25,13 @@ bool furDScanWrite(uint8_t reg, int i) {
 	};
 	if ((i&15) == 0) {
 		uint32_t regval = (furDSregs[i|0]<<0)|
-						  (furDSregs[i|1]<<8)|
-					 	  (furDSregs[i|2]<<16)|
-				          (furDSregs[i|3]<<24);
+                          (furDSregs[i|1]<<8)|
+                          (furDSregs[i|2]<<16)|
+                          (furDSregs[i|3]<<24);
 		uint32_t regval2 = (oldfurDSregs[i|0]<<0)|
-						   (oldfurDSregs[i|1]<<8)|
-						   (oldfurDSregs[i|2]<<16)|
-				           (oldfurDSregs[i|3]<<24);
+                           (oldfurDSregs[i|1]<<8)|
+                           (oldfurDSregs[i|2]<<16)|
+                           (oldfurDSregs[i|3]<<24);
 		memcpy(oldfurDSregs,furDSregs,sizeof(uint8_t)*512);
 		return regval != regval2;
 	}
