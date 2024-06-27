@@ -52,7 +52,7 @@ void furDSinit() {
 		loopStart = -3;
 		noLoop = 1;
 	} else {
-		loopStart = loopPoint;
+		loopStart = loopPoint+6;
 		noLoop = 0;
 	}
 	for (int i = 0; i < 256; i++) furDSregs[i] = 0;
@@ -68,6 +68,7 @@ void furDSinit() {
 	for (int frame = 0; frame < 4; frame++) {
 		swiWaitForVBlank();
 	}
+	printf("\e[22;3HFurDS was made by AArt1256");
 	timerStart(0, ClockDivider_1024, TIMER_FREQ_1024(((int)songRate)), furDSplay);
 }
 
@@ -77,7 +78,8 @@ vBlankFurDS:
 		int CMD = -1;
 		int songOffsetTmp = songOffset;
 		int furDSFifoAmt = 0;
-		while (tickDelay == 0) {
+		bool contWhile = true;
+		while (contWhile) {
 			CMD = song[songOffset++];
 			if (songOffset >= songLength) {
 				songOffset = loopStart+3;
@@ -96,6 +98,7 @@ vBlankFurDS:
 				case 1: {
 					tickDelay = song[songOffset++];
 					tickDelay |= song[songOffset++]<<8;
+					contWhile = false;
 					break;
 				}
 			}
@@ -109,7 +112,8 @@ vBlankFurDS:
 		songOffset = songOffsetTmp;
 		int furDSFifoAmtPre = furDSFifoAmt;
 		furDSFifoAmt = 0;
-		while (tickDelay == 0) {
+		contWhile = true;
+		while (contWhile) {
 			CMD = song[songOffset++];
 			if (songOffset >= songLength) {
 				songOffset = loopStart+3;
@@ -156,13 +160,13 @@ vBlankFurDS:
 				case 1: {
 					tickDelay = song[songOffset++];
 					tickDelay |= song[songOffset++]<<8;
+					contWhile = false;
 					break;
 				}
 			}
 		}
 		furDSFIFOusage = furDSFifoAmt;
 		//printf("\e[23;28HFIFO");
-		printf("\e[22;3HFurDS was made by AArt1256");
 		//printf("\e[23;0HOffset: %d",songOffset);
 		//printf("%04d %04d\n",furDSFifoAmt,furDSFifoAmtPre);
 	} else {

@@ -62,6 +62,8 @@ void furDShandler(u32 command, void *userdata) {
 	 		addr = command&0x1ff;
 			SCHANNEL_REG(addr) = data;
 		} else {
+			for (int i = 0; i < 256; i++)
+				SCHANNEL_REG(i<<4) = 0;
 			for (int i = 0; i < 16; i++)
 				SCHANNEL_REG(i<<4) = data;
 		}
