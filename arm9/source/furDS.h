@@ -9,6 +9,7 @@ extern int loopPoint;
 extern unsigned int songLength;
 extern unsigned int songRate;
 uint8_t furDSregs[0x200];
+uint8_t oldfurDSregs[0x200];
 
 int loopStart = 0;
 int songOffset = 0;
@@ -16,11 +17,25 @@ unsigned int tickDelay = 0;
 int noLoop = 0;
 
 bool furDScanWrite(uint8_t reg, int i) {
-	if ((i&15) == 0) return true;
-	if ((reg&15) == 0x09) return true;
-	if ((reg&15) == 0x0B) return true;
-	if ((reg&3) == 3) return true;
-	return false;
+	const bool canWriteLut[16] = {
+		true , true , true , true ,
+		false, false, false, true ,
+		false, true , false, true ,
+		false, false, false, true ,
+	};
+	if ((i&15) == 0) {
+		uint32_t regval = (furDSregs[i|0]<<0)|
+						  (furDSregs[i|1]<<8)|
+					 	  (furDSregs[i|2]<<16)|
+				          (furDSregs[i|3]<<24);
+		uint32_t regval2 = (oldfurDSregs[i|0]<<0)|
+						   (oldfurDSregs[i|1]<<8)|
+						   (oldfurDSregs[i|2]<<16)|
+				           (oldfurDSregs[i|3]<<24);
+		memcpy(oldfurDSregs,furDSregs,sizeof(uint8_t)*512);
+		return regval != regval2;
+	}
+	return canWriteLut[reg&15];
 }
 
 void furDSplay();
@@ -121,6 +136,8 @@ vBlankFurDS:
 						printf("FIFO overrun?\n");
 					}
 					if (((furDSFifoAmtPre > 100 && furDSFifoAmt < 100) || !(furDSFifoAmtPre > 100)) && furDScanWrite(reg,i)) {
+						//printf("%02x: %02x %02x: %08x\n",reg,val,i,regval);
+						//if (((i&15)) == 0) printf("%08x %08x\n",regval,(regval&(~(3<<27)))|(1<<27));
 						fifoSendValue32(FIFO_USER_01,regval);
 						fifoSendValue32(FIFO_USER_01,i);
 						furDSFifoAmt++;
