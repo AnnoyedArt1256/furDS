@@ -49,10 +49,10 @@ void furDSinit() {
 	songOffset = 0;
 	tickDelay = 0;
 	if (loopPoint == -1) {
-		loopStart = -3;
+		loopStart = 0;
 		noLoop = 1;
 	} else {
-		loopStart = loopPoint+6;
+		loopStart = loopPoint;
 		noLoop = 0;
 	}
 	for (int i = 0; i < 256; i++) furDSregs[i] = 0;
@@ -82,7 +82,7 @@ vBlankFurDS:
 		while (contWhile) {
 			CMD = song[songOffset++];
 			if (songOffset >= songLength) {
-				songOffset = loopStart+3;
+				songOffset = loopStart;
 				furDSFifoAmt++;
 				break;
 			}
@@ -116,7 +116,7 @@ vBlankFurDS:
 		while (contWhile) {
 			CMD = song[songOffset++];
 			if (songOffset >= songLength) {
-				songOffset = loopStart+3;
+				songOffset = loopStart;
 				if (noLoop) {
 					for (int i = 0; i < 256; i++) furDSregs[i] = 0;
 					for (int i = 0; i < 256; i++) furDSregs2[i] = 0;
