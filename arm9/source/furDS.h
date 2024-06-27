@@ -18,6 +18,8 @@ int songOffset = 0;
 unsigned int tickDelay = 0;
 int noLoop = 0;
 
+int furDSFIFOusage = 0;
+
 bool furDScanWrite(uint8_t reg, int i, uint8_t *regs, uint8_t *oldregs) {
 	const bool canWriteLut[16] = {
 		true , true , true , true ,
@@ -99,7 +101,8 @@ vBlankFurDS:
 			}
 		}
 		if (furDSFifoAmt > 100) {
-			printf("FIFO overrun!!!\n");
+			furDSFIFOusage = 101;
+			//printf("FIFO overrun!!!\n");
 			return;
 		}
 		tickDelay = 0;
@@ -136,13 +139,10 @@ vBlankFurDS:
 									  (furDSregs[i|2]<<16)|
 				           			  (furDSregs[i|3]<<24);
 					if ((i&15) == 4) {
-						printf("%08lx ",regval);
-						printf("%08lx ",samples);
 						regval += (uint32_t)samples;
-						printf("%08lx\n",regval);
 					}
 					if (furDSFifoAmt > 100) {
-						printf("FIFO overrun?\n");
+						//printf("FIFO overrun?\n");
 					}
 					if (((furDSFifoAmtPre > 100 && furDSFifoAmt < 100) || (furDSFifoAmtPre < 100)) && furDScanWrite(reg,i,furDSregs,oldfurDSregs)) {
 						//printf("%02x: %02x %02x: %08x\n",reg,val,i,regval);
@@ -160,8 +160,13 @@ vBlankFurDS:
 				}
 			}
 		}
+		furDSFIFOusage = furDSFifoAmt;
+		//printf("\e[23;28HFIFO");
+		printf("\e[22;3HFurDS was made by AArt1256");
+		//printf("\e[23;0HOffset: %d",songOffset);
 		//printf("%04d %04d\n",furDSFifoAmt,furDSFifoAmtPre);
 	} else {
+		furDSFIFOusage = 0;
 		tickDelay--;
 		if (tickDelay == 0) goto vBlankFurDS;
 	}
