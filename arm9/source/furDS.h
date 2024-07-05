@@ -49,10 +49,10 @@ void furDSinit() {
 	songOffset = 0;
 	tickDelay = 0;
 	if (loopPoint == -1) {
-		loopStart = 0;
+		loopStart = 3;
 		noLoop = 1;
 	} else {
-		loopStart = loopPoint;
+		loopStart = loopPoint+3;
 		noLoop = 0;
 	}
 	for (int i = 0; i < 256; i++) furDSregs[i] = 0;
